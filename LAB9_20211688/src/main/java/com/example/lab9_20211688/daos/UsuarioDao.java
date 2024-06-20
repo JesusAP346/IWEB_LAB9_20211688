@@ -75,4 +75,53 @@ public class UsuarioDao  extends BaseDao{
 
         return listaUsuarios;
     }
+
+    public boolean validarUsuarioPasswordHashed(String username, String password) {
+        boolean exito = false;
+        String sql = "SELECT * FROM credenciales_usuario where correo=? and contrasña_encriptada = sha2(?,256)";
+        try(Connection conn = getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)){
+
+            pstmt.setString(1,username);
+            pstmt.setString(2,password);
+
+            try(ResultSet rs = pstmt.executeQuery()){
+                if(rs.next()){
+                    exito = true;
+                }
+            }
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return exito;
+
+    }
+
+    public UsuarioB obtenerUsuario(String username) {
+        UsuarioB usuario = null;
+
+        String sql = "";
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+
+                if (rs.next()) {
+                    usuario = new UsuarioB();
+
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return usuario;
+
+    }
 }
